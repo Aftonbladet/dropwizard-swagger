@@ -18,54 +18,57 @@ import static junit.framework.Assert.assertEquals;
 
 public class DemoServiceTest {
 
-  private static File configFile;
+	private static File configFile;
 
-  @BeforeClass
-  public static void setUpClass() throws IOException, InterruptedException {
-    configFile = File.createTempFile("dropwizard-swagger", ".yml");
-    configFile.deleteOnExit();
+	private static final int HTTP_PORT = 64222;
+	private static final int ADMIN_PORT = 64223;
 
-    Files.write("name: Test\n".getBytes(Charsets.UTF_8), configFile);
+	@BeforeClass
+	public static void setUpClass() throws IOException, InterruptedException {
+		configFile = File.createTempFile("dropwizard-swagger", ".yml");
+		configFile.deleteOnExit();
 
-    Thread runner = new Thread() {
-      @Override
-      public void run() {
-        try {
-          DemoService.main(new String[]{"server", configFile.getAbsolutePath()});
-        } catch (Exception e) {
-          throw Throwables.propagate(e);
-        }
-      }
-    };
+		Files.write("name: Test\n".getBytes(Charsets.UTF_8), configFile);
+		Files.append("http:\n    port: " + HTTP_PORT + "\n    adminPort: " + ADMIN_PORT, configFile, Charsets.UTF_8);
+		Thread runner = new Thread() {
+			@Override
+			public void run() {
+				try {
+					DemoService.main(new String[]{"server", configFile.getAbsolutePath()});
+				} catch (Exception e) {
+					throw Throwables.propagate(e);
+				}
+			}
+		};
 
-    runner.setDaemon(true);
-    runner.start();
+		runner.setDaemon(true);
+		runner.start();
 
-    // TODO replace with wait for port
-    TimeUnit.SECONDS.sleep(5);
-  }
+		// TODO replace with wait for port
+		TimeUnit.SECONDS.sleep(5);
+	}
 
-  private void assertUriExists(String uri) throws IOException {
-    HttpClient client = new DefaultHttpClient();
-    HttpGet get = new HttpGet("http://localhost:8080" + uri);
+	private void assertUriExists(String uri) throws IOException {
+		HttpClient client = new DefaultHttpClient();
+		HttpGet get = new HttpGet("http://localhost:" + HTTP_PORT + uri);
 
-    HttpResponse response = client.execute(get);
-    assertEquals(200, response.getStatusLine().getStatusCode());
-  }
+		HttpResponse response = client.execute(get);
+		assertEquals(200, response.getStatusLine().getStatusCode());
+	}
 
-  @Test
-  public void testPetResource() throws IOException {
-    assertUriExists("/pet");
-  }
+	@Test
+	public void testPetResource() throws IOException {
+		assertUriExists("/pet");
+	}
 
-  @Test
-  public void testSwaggerUI() throws IOException {
-    assertUriExists("/swagger-ui/index.html");
-  }
+	@Test
+	public void testSwaggerUI() throws IOException {
+		assertUriExists("/swagger-ui/index.html");
+	}
 
-  @Test
-  public void testApiDescription() throws IOException {
-    assertUriExists("/api-docs");
-    assertUriExists("/api-docs/pet");
-  }
+	@Test
+	public void testApiDescription() throws IOException {
+		assertUriExists("/api-docs");
+		assertUriExists("/api-docs/pet");
+	}
 }
