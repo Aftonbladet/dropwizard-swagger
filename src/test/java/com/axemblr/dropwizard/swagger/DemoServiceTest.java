@@ -3,16 +3,18 @@ package com.axemblr.dropwizard.swagger;
 import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.io.Files;
-import java.io.File;
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-import static junit.framework.Assert.assertEquals;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+import static junit.framework.Assert.assertEquals;
 
 public class DemoServiceTest {
 
@@ -53,7 +55,7 @@ public class DemoServiceTest {
 
   @Test
   public void testPetResource() throws IOException {
-    assertUriExists("/pet.json");
+    assertUriExists("/pet");
   }
 
   @Test
@@ -63,7 +65,7 @@ public class DemoServiceTest {
 
   @Test
   public void testApiDescription() throws IOException {
-    assertUriExists("/api-docs.json");
-    assertUriExists("/api-docs.json/pet");
+    assertUriExists("/api-docs");
+    assertUriExists("/api-docs/pet");
   }
 }
